@@ -36,6 +36,16 @@ public class Mysql {
     private Connection conn = null;
 
     /**
+     * 事务状态
+     */
+    private boolean isTransaction = false;
+
+    /**
+     * 事务保存点
+     */
+    private List<String> savePoint;
+
+    /**
      * 配置文件读取
      */
     static {
@@ -46,6 +56,11 @@ public class Mysql {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Mysql(boolean isTransaction){
+        this();
+        if(isTransaction) begin();
     }
 
     public Mysql(){
@@ -175,12 +190,87 @@ public class Mysql {
         return new Delete(conn);
     }
 
+    /**
+     * 开启事务
+     */
+    public int begin(){
+        if(!isTransaction){
+            isTransaction = true;
+            savePoint = new ArrayList<>();
+            return execute("BEGIN");
+        }
+        return 0;
+    }
+
+
+    /**
+     * 提交事务
+     */
+    public int commit(){
+        // 是否需要关闭
+        if(isTransaction){
+            return execute("COMMIT");
+        }
+
+        return 0;
+    }
+
+    /**
+     * 创建保存点
+     * @param savePoint         保存点名称
+     * @return                  1.设置成功
+     */
+    public int save(String savePoint){
+        if(isTransaction && !this.savePoint.contains(savePoint)){
+            if(!Character.isLetter(savePoint.charAt(0)))
+                throw new RuntimeException("保存点\""+savePoint+"\"没有以字母开头");
+
+            this.savePoint.add(savePoint);
+            return execute("SAVEPOINT "+savePoint);
+        }
+        return 0;
+    }
+
+    /**
+     * 获取保存点
+     * @param savePoint         保存点名称
+     * @return                  保存点语句字符串
+     */
+    private String getSavePoint(String savePoint){
+        if(!savePoint.isEmpty() && this.savePoint != null && this.savePoint.size() > 0){
+            if(this.savePoint.contains(savePoint)){
+                return " TO "+savePoint;
+            }
+        }
+
+        return "";
+    }
+
+    /**
+     * 事务回滚
+     * @param savePoint     保存点名称
+     * @return              1.回滚成功
+     */
+    public int back(String savePoint){
+        // 是否需要关闭
+        if(isTransaction){
+            String savePointStr = getSavePoint(savePoint);
+            return execute("ROLLBACK"+savePointStr);
+        }
+
+        return 0;
+    }
+    public int back(){
+        return back("");
+    }
 
     /**
      * 关闭所有对象
      */
     public void close(){
         try {
+            commit();
+
             if(conn != null)
                 conn.close();
 

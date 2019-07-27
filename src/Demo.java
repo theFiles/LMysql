@@ -1,16 +1,16 @@
 import lmysql.Mysql;
 
-import java.util.List;
-import java.util.Map;
-
 public class Demo {
     public static void main(String[] args) {
         Mysql mysql = new Mysql();
 
-        List<Map> res = mysql
-                .select("id","name","sex")
-                .from("user")
+        int res = mysql
+                .update("goodsinfo")
+                .set("goods_name","测试1")
+                .where("id",7)
                 .query(1);
-        
+
+
+        mysql.close();
     }
 }
