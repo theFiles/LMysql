@@ -51,6 +51,66 @@ Mysql mysql = new Mysql();
 mysql.close();
 ```
 
+> #### 事务功能
+
+
+##### 1. 启动一个事务
+
+```java
+// 实例化配置类时传入 true 启动事务
+Mysql mysql = new Mysql(true);
+
+// 或者通过通过 begin() 启动
+Mysql mysql2 = new Mysql();
+mysql2.begin();
+```
+##### 2. 创建一个保存点
+* 第一个字符必须是字母！
+```java
+// 实例化一个事务配置类
+Mysql mysql = new Mysql(true);
+
+// 通过 save() 设置保存点
+mysql.save("a"); // 第一个字符必须是字母
+```
+##### 3. 提交事务
+```java
+// 实例化一个事务配置类
+Mysql mysql = new Mysql(true);
+
+// 这里执行了一堆sql
+...
+
+// 通过 commit() 提交
+mysql.commit();
+
+// 也可以通过 close() 关闭连接并提交
+mysql.close()
+```
+##### 4. 事务回滚
+```java
+// 实例化一个事务配置类
+Mysql mysql = new Mysql(true);
+
+// 执行一堆sql
+...sql1
+
+// 创建了一个保存点
+mysql.save("lidaye");
+
+// 再执行一堆sql
+...sql2
+
+// 通过 back() 回滚到保存点 lidaye
+// back() 不传参则全部回滚
+mysql.back("lidaye");
+
+// 提交事务并关闭连接
+mysql.close();
+// 只执行了 sql1 的sql命令
+
+```
+
 ### LMysql父类
 * `abstract public class LMysql<T,R>`主要逻辑共用抽象类，平时调用不会直接用到，需要依靠其他操作类的继承调用。
 
