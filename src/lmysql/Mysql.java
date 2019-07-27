@@ -28,7 +28,7 @@ public class Mysql {
     /**
      * 错误提示（暂时毛用）
      */
-    private static List<String> errorList = new ArrayList<>();
+    private static List<String> errorList;
 
     /**
      * 数据库连接
@@ -82,11 +82,26 @@ public class Mysql {
         }
     }
 
+    /**
+     * 记录该次连接的sql运行错误
+     * @param err       sql错误提示
+     */
     public static void setErrorList(String err){
+        if(errorList == null)
+            errorList = new ArrayList<>();
+
         if(errorList.size() > 4)
             errorList.remove(0);
 
         errorList.add(err);
+    }
+
+    /**
+     * 获取索引错误提示
+     * @return      错误提示,默认5条上限
+     */
+    public static List<String> getErrorList() {
+        return errorList;
     }
 
     /**
