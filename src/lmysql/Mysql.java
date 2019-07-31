@@ -217,7 +217,7 @@ public class Mysql {
     /**
      * 创建保存点
      * @param savePoint         保存点名称
-     * @return                  1.设置成功
+     * @return                  true 设置成功
      */
     public boolean save(String savePoint){
         if(isTransaction && this.savePoint.get(savePoint) == null){

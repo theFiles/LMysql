@@ -7,12 +7,19 @@ import java.util.List;
 import java.util.Map;
 
 public class Select extends LMysql<Select,List<Map>>{
+    /**
+     * 默认查询结果
+     */
+    public final String DEFAULT_RES = "*";
 
     /**
      * 设置结果集
      */
     private String[] select;
 
+    /**
+     * 查询字段长度
+     */
     private int selectLen;
 
     /**
@@ -25,7 +32,7 @@ public class Select extends LMysql<Select,List<Map>>{
     }
 
     private String getSelect(){
-        if(selectLen == 0) return "*";
+        if(selectLen == 0){return DEFAULT_RES;}
 
         StringBuffer selSql = new StringBuffer("`"+select[0]+"`");
 
@@ -36,6 +43,7 @@ public class Select extends LMysql<Select,List<Map>>{
         return selSql.toString();
     }
 
+    @Override
     public Select getThis(){
         return this;
     }
@@ -44,6 +52,7 @@ public class Select extends LMysql<Select,List<Map>>{
     /**
      * 运行sql
      */
+    @Override
     public List<Map> query(){
         return execute();
     }
@@ -51,6 +60,7 @@ public class Select extends LMysql<Select,List<Map>>{
     /**
      * 取出通过设定参数拼接的sql
      */
+    @Override
     public String getSql(){
         return "SELECT "+getSelect()+" FROM "+getFrom()+" WHERE "+ getWhereAll();
     }

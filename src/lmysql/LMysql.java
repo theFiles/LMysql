@@ -432,11 +432,10 @@ abstract public class LMysql<T,R> {
      */
     public void close(){
         try {
-            if (res != null)
-                res.close();
+            if (res != null){res.close();}
 
-            if (db != null)
-                db.close();
+            if (db != null){db.close();}
+
         } catch (SQLException e) {
             Mysql.setErrorList(e.getMessage());
         }

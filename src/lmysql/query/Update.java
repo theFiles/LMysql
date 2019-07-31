@@ -17,7 +17,7 @@ public class Update extends LMysql<Update,Integer> {
         for (int i=0; i<len; i++){
             String key = updateField[i];
             Object value = info.get(key);
-            if(value != null) set(key,value);
+            if(value != null){set(key,value);}
         }
     }
     public Update(Connection conn, String table){
