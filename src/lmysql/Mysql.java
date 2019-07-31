@@ -1,15 +1,14 @@
 package lmysql;
 
+import com.alibaba.druid.pool.DruidDataSourceFactory;
 import ljson.ILJson;
 import lmysql.query.*;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 实例化类数据库连接
@@ -31,6 +30,11 @@ public class Mysql {
     private static List<String> errorList;
 
     /**
+     * 错误提示存储量
+     */
+    private static final byte ERROR_COUNT = 4;
+
+    /**
      * 数据库连接
      */
     private Connection conn = null;
@@ -43,7 +47,12 @@ public class Mysql {
     /**
      * 事务保存点
      */
-    private List<String> savePoint;
+    private Map<String,Savepoint> savePoint;
+
+    /**
+     * 连接池对象
+     */
+    private static DataSource dataSource;
 
     /**
      * 配置文件读取
@@ -53,14 +62,15 @@ public class Mysql {
         props = new Properties();
         try {
             props.load(is);
-        } catch (IOException e) {
+            dataSource = DruidDataSourceFactory.createDataSource(props);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public Mysql(boolean isTransaction){
         this();
-        if(isTransaction) begin();
+        if(isTransaction){begin();}
     }
 
     public Mysql(){
@@ -72,14 +82,13 @@ public class Mysql {
      */
     private boolean getConn(){
         try {
-            Class.forName(props.getProperty("mysql.driver"));
-            conn = setConnect();
+            conn = dataSource.getConnection();
             return true;
-        } catch (ClassNotFoundException e) {
+        } catch (SQLException e) {
             setErrorList(e.getMessage());
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     /**
@@ -87,11 +96,9 @@ public class Mysql {
      * @param err       sql错误提示
      */
     public static void setErrorList(String err){
-        if(errorList == null)
-            errorList = new ArrayList<>();
+        if(errorList == null){errorList = new ArrayList<>();}
 
-        if(errorList.size() > 4)
-            errorList.remove(0);
+        if(errorList.size() > ERROR_COUNT){errorList.remove(0);}
 
         errorList.add(err);
     }
@@ -100,47 +107,14 @@ public class Mysql {
      * 获取索引错误提示
      * @return      错误提示,默认5条上限
      */
-    public static List<String> getErrorList() {
+    public List<String> getErrorList() {
         return errorList;
     }
 
     /**
-     * 连接数据库
-     */
-    private Connection setConnect(){
-        if(conn == null){
-            try {
-                return DriverManager.getConnection(
-                    getConfigString(),
-                    props.getProperty("mysql.root"),
-                    props.getProperty("mysql.pwd")
-                );
-            } catch (SQLException e) {
-                setErrorList(e.getMessage());
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        return conn;
-    }
-
-    /**
-     * 生成数据库请求
-     */
-    private String getConfigString(){
-        return "jdbc:mysql://"
-                +props.getProperty("mysql.host")
-                +":"+props.getProperty("mysql.port")
-                +"/"+props.getProperty("mysql.dbName")
-                +"?characterEncoding="+props.getProperty("mysql.characterEncoding")
-                +"&useSSL="+props.getProperty("mysql.useSSL")
-                +"&serverTimezone="+props.getProperty("mysql.serverTimezone");
-    }
-
-    /**
      * 执行对象（查询）
+     * @param sql           sql语句
+     * @param replaceVal    换位符替换值
      */
     public List query(String sql, Object... replaceVal){
         return (List)(new Query(conn,sql,false).setReplaceVal(replaceVal).query());
@@ -208,26 +182,36 @@ public class Mysql {
     /**
      * 开启事务
      */
-    public int begin(){
+    public boolean begin(){
         if(!isTransaction){
             isTransaction = true;
-            savePoint = new ArrayList<>();
-            return execute("BEGIN");
+            savePoint = new HashMap<>();
+            try {
+                conn.setAutoCommit(false);
+                return true;
+            } catch (SQLException e) {
+                setErrorList(e.getMessage());
+            }
         }
-        return 0;
+        return false;
     }
 
 
     /**
      * 提交事务
      */
-    public int commit(){
+    public boolean commit(){
         // 是否需要关闭
         if(isTransaction){
-            return execute("COMMIT");
+            try {
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                setErrorList(e.getMessage());
+            }
         }
 
-        return 0;
+        return false;
     }
 
     /**
@@ -235,48 +219,51 @@ public class Mysql {
      * @param savePoint         保存点名称
      * @return                  1.设置成功
      */
-    public int save(String savePoint){
-        if(isTransaction && !this.savePoint.contains(savePoint)){
-            if(!Character.isLetter(savePoint.charAt(0)))
-                throw new RuntimeException("保存点\""+savePoint+"\"没有以字母开头");
-
-            this.savePoint.add(savePoint);
-            return execute("SAVEPOINT "+savePoint);
-        }
-        return 0;
-    }
-
-    /**
-     * 获取保存点
-     * @param savePoint         保存点名称
-     * @return                  保存点语句字符串
-     */
-    private String getSavePoint(String savePoint){
-        if(!savePoint.isEmpty() && this.savePoint != null && this.savePoint.size() > 0){
-            if(this.savePoint.contains(savePoint)){
-                return " TO "+savePoint;
+    public boolean save(String savePoint){
+        if(isTransaction && this.savePoint.get(savePoint) == null){
+            try {
+                Savepoint savepoint = conn.setSavepoint(savePoint);
+                this.savePoint.put(savePoint,savepoint);
+                return true;
+            } catch (SQLException e) {
+                setErrorList(e.getMessage());
             }
         }
-
-        return "";
+        return false;
     }
 
     /**
      * 事务回滚
      * @param savePoint     保存点名称
-     * @return              1.回滚成功
+     * @return              true 回滚成功
      */
-    public int back(String savePoint){
+    public boolean back(String savePoint){
+        Savepoint point = this.savePoint.get(savePoint);
         // 是否需要关闭
-        if(isTransaction){
-            String savePointStr = getSavePoint(savePoint);
-            return execute("ROLLBACK"+savePointStr);
+        if(isTransaction && point != null){
+
+            try {
+                conn.rollback(point);
+                return true;
+            } catch (SQLException e) {
+                setErrorList(e.getMessage());
+            }
         }
 
-        return 0;
+        return false;
     }
-    public int back(){
-        return back("");
+
+    public boolean back(){
+        if(isTransaction){
+            try {
+                conn.rollback();
+                return true;
+            } catch (SQLException e) {
+                setErrorList(e.getMessage());
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -286,8 +273,9 @@ public class Mysql {
         try {
             commit();
 
-            if(conn != null)
-                conn.close();
+            if(conn != null){conn.close();}
+
+
 
         } catch (SQLException e) {
             setErrorList(e.getMessage());
