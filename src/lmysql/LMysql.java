@@ -1,6 +1,7 @@
 package lmysql;
 
 import com.sun.istack.internal.NotNull;
+import ljson.ILJson;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -456,7 +457,7 @@ abstract public class LMysql<T,R> {
         return buff.toString();
     }
 
-    protected List<Map> resToList(ResultSet res) throws SQLException {
+    private List<Map> resToList(ResultSet res) throws SQLException {
         List<Map> list = new ArrayList<>();
         ResultSetMetaData data = res.getMetaData();
         int len = data.getColumnCount();
@@ -473,4 +474,5 @@ abstract public class LMysql<T,R> {
 
         return list;
     }
+
 }

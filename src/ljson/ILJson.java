@@ -20,7 +20,8 @@ public interface ILJson {
 
 
         for (Field f:declaredFields){
-            String key = f.getName(); // 属性名
+            // 属性名
+            String key = f.getName();
 
             // 通过属性名取get方法名
             String methodName = "get"

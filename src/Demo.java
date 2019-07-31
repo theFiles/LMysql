@@ -2,7 +2,7 @@ import lmysql.Mysql;
 
 public class Demo {
     public static void main(String[] args) {
-        Mysql mysql = new Mysql(true);
+        Mysql mysql = new Mysql();
 
         int res = mysql
                 .update("goodsinfo")

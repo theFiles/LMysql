@@ -1,10 +1,15 @@
 package lmysql.query;
 
+import ljson.ILJson;
+import ljson.LJson;
 import lmysql.*;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class Select extends LMysql<Select,List<Map>>{
     /**
@@ -55,6 +60,33 @@ public class Select extends LMysql<Select,List<Map>>{
     @Override
     public List<Map> query(){
         return execute();
+    }
+
+    /**
+     * 运行结果存到指定类中
+     */
+    public List<ILJson> query(ILJson obj){
+        List<ILJson> returnList = new ArrayList<>();
+        List<Map> res = execute();
+        if(res != null && res.size() > 0) {
+            Set<String> keys = res.get(0).keySet();
+            for (Map r : res) {
+                try {
+                    ILJson nowObj = obj.getClass().newInstance();
+                    for (String key : keys) {
+                        nowObj.set(key, r.get(key).toString());
+                    }
+                    returnList.add(nowObj);
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return returnList;
+        }
+        return null;
     }
 
     /**
