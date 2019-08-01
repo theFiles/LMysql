@@ -36,7 +36,7 @@ public class Mysql {
     /**
      * 数据库连接
      */
-    private static ThreadLocal<Connection> conn;
+    private static ThreadLocal<Connection> conn = new ThreadLocal<>();
 
     /**
      * 事务状态
@@ -85,9 +85,8 @@ public class Mysql {
      * 配置数据库连接
      */
     private boolean getConn(){
-        if(conn == null){
+        if(conn.get() == null){
             try {
-                conn = new ThreadLocal<>();
                 conn.set(dataSource.getConnection());
                 return true;
             } catch (SQLException e) {
@@ -290,7 +289,7 @@ public class Mysql {
      */
     public void close(){
         try {
-            commit();
+            if(isTransaction){commit();}
 
             if(conn != null){
                 conn.get().close();
