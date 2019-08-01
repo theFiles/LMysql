@@ -19,6 +19,7 @@ public class Demo {
                 .query(1);
 
         mysql.back("a");
+
         System.out.println(mysql.getErrorList());
 
         mysql.close();
