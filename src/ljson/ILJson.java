@@ -80,7 +80,11 @@ public interface ILJson {
                 keySet ;
 
         for (String k:keys){
-            set(k,map.get(k).toString());
+            Object mapVal = map.get(k);
+
+            if(mapVal != null){
+                set(k,mapVal.toString());
+            }
         }
     }
     default void set(Map map){

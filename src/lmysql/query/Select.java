@@ -65,17 +65,17 @@ public class Select extends LMysql<Select,List<Map>>{
     /**
      * 运行结果存到指定类中
      */
-    public List<ILJson> query(ILJson obj){
-        List<ILJson> returnList = new ArrayList<>();
+    public <E> List<E> query(E obj){
+        List<E> returnList = new ArrayList<>();
         List<Map> res = execute();
         if(res != null && res.size() > 0) {
             Set<String> keys = res.get(0).keySet();
-            Class<? extends ILJson> iLjsonClass = obj.getClass();
+            Class iLjsonClass = obj.getClass();
             for (Map r : res) {
                 try {
-                    ILJson nowObj = iLjsonClass.newInstance();
+                    ILJson nowObj = (ILJson)iLjsonClass.newInstance();
                     nowObj.set(r,keys);
-                    returnList.add(nowObj);
+                    returnList.add((E)nowObj);
                 } catch (InstantiationException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
