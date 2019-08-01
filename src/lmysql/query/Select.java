@@ -70,12 +70,11 @@ public class Select extends LMysql<Select,List<Map>>{
         List<Map> res = execute();
         if(res != null && res.size() > 0) {
             Set<String> keys = res.get(0).keySet();
+            Class<? extends ILJson> iLjsonClass = obj.getClass();
             for (Map r : res) {
                 try {
-                    ILJson nowObj = obj.getClass().newInstance();
-                    for (String key : keys) {
-                        nowObj.set(key, r.get(key).toString());
-                    }
+                    ILJson nowObj = iLjsonClass.newInstance();
+                    nowObj.set(r,keys);
                     returnList.add(nowObj);
                 } catch (InstantiationException e) {
                     e.printStackTrace();

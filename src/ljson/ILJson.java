@@ -3,6 +3,7 @@ package ljson;
 import java.lang.reflect.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public interface ILJson {
 
@@ -66,6 +67,24 @@ public interface ILJson {
 //            e.printStackTrace();
         }
         return false;
+    }
+
+    /**
+     * 通过map修改类的内容
+     * @param map       map集合
+     * @param keySet    键名集合
+     */
+    default void set(Map map,Set<String> keySet){
+        Set<String> keys = keySet == null ?
+                map.keySet() :
+                keySet ;
+
+        for (String k:keys){
+            set(k,map.get(k).toString());
+        }
+    }
+    default void set(Map map){
+        set(map,null);
     }
 
     /**
