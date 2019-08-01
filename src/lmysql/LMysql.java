@@ -1,7 +1,6 @@
 package lmysql;
 
 import com.sun.istack.internal.NotNull;
-import ljson.ILJson;
 
 import java.sql.*;
 import java.util.ArrayList;

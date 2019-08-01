@@ -1,7 +1,6 @@
 package lmysql.query;
 
 import ljson.ILJson;
-import ljson.LJson;
 import lmysql.*;
 
 import java.sql.*;
@@ -9,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public class Select extends LMysql<Select,List<Map>>{
     /**

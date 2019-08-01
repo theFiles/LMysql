@@ -5,7 +5,6 @@ import ljson.ILJson;
 import lmysql.query.*;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.util.*;
@@ -37,12 +36,17 @@ public class Mysql {
     /**
      * 数据库连接
      */
-    private Connection conn = null;
+    private static ThreadLocal<Connection> conn;
 
     /**
      * 事务状态
      */
     private boolean isTransaction = false;
+
+    /**
+     * 事务状态检测提示
+     */
+    private static final String TRANSACTION_TIPS = "事务状态异常!";
 
     /**
      * 事务保存点
@@ -81,13 +85,17 @@ public class Mysql {
      * 配置数据库连接
      */
     private boolean getConn(){
-        try {
-            conn = dataSource.getConnection();
-            return true;
-        } catch (SQLException e) {
-            setErrorList(e.getMessage());
-            e.printStackTrace();
+        if(conn == null){
+            try {
+                conn = new ThreadLocal<>();
+                conn.set(dataSource.getConnection());
+                return true;
+            } catch (SQLException e) {
+                setErrorList(e.getMessage());
+                e.printStackTrace();
+            }
         }
+
         return false;
     }
 
@@ -117,30 +125,30 @@ public class Mysql {
      * @param replaceVal    换位符替换值
      */
     public List query(String sql, Object... replaceVal){
-        return (List)(new Query(conn,sql,false).setReplaceVal(replaceVal).query());
+        return (List)(new Query(conn.get(),sql,false).setReplaceVal(replaceVal).query());
     }
     public List query(String sql){
-        return (List)(new Query(conn,sql,false).query());
+        return (List)(new Query(conn.get(),sql,false).query());
     }
 
     /**
      * 执行对象（修改）
      */
     public int execute(String sql, Object... replaceVal){
-        return (int)(new Query(conn,sql,true).setReplaceVal(replaceVal).query());
+        return (int)(new Query(conn.get(),sql,true).setReplaceVal(replaceVal).query());
     }
     public int execute(String sql){
-        return (int)(new Query(conn,sql,true).query());
+        return (int)(new Query(conn.get(),sql,true).query());
     }
 
     /**
      * 查 对象
      */
     public Select select(){
-        return new Select(conn,new String[0]);
+        return new Select(conn.get(),new String[0]);
     }
     public Select select(String... field){
-        return new Select(conn,field);
+        return new Select(conn.get(),field);
     }
 
     /**
@@ -150,48 +158,48 @@ public class Mysql {
         return insert(obj.getParam());
     }
     public Insert insert(Map info){
-        return new Insert(conn,info);
+        return new Insert(conn.get(),info);
     }
     public Insert insert(String... field){
-        return new Insert(conn,field);
+        return new Insert(conn.get(),field);
     }
 
     /**
      * 改 对象
      */
     public Update update(ILJson obj,String... updateField){
-        return new Update(conn,obj,updateField);
+        return new Update(conn.get(),obj,updateField);
     }
     public Update update(String table){
-        return new Update(conn,table);
+        return new Update(conn.get(),table);
     }
     public Update update(){
-        return new Update(conn);
+        return new Update(conn.get());
     }
 
     /**
      * 删 对象
      */
     public Delete delete(String table){
-        return new Delete(conn,table);
+        return new Delete(conn.get(),table);
     }
     public Delete delete(){
-        return new Delete(conn);
+        return new Delete(conn.get());
     }
 
     /**
      * 开启事务
      */
     public boolean begin(){
-        if(!isTransaction){
-            isTransaction = true;
-            savePoint = new HashMap<>();
-            try {
-                conn.setAutoCommit(false);
-                return true;
-            } catch (SQLException e) {
-                setErrorList(e.getMessage());
-            }
+        checkTransaction(false);
+
+        isTransaction = true;
+        savePoint = new HashMap<>();
+        try {
+            conn.get().setAutoCommit(false);
+            return true;
+        } catch (SQLException e) {
+            setErrorList(e.getMessage());
         }
         return false;
     }
@@ -201,14 +209,14 @@ public class Mysql {
      * 提交事务
      */
     public boolean commit(){
+        checkTransaction(true);
+
         // 是否需要关闭
-        if(isTransaction){
-            try {
-                conn.commit();
-                return true;
-            } catch (SQLException e) {
-                setErrorList(e.getMessage());
-            }
+        try {
+            conn.get().commit();
+            return true;
+        } catch (SQLException e) {
+            setErrorList(e.getMessage());
         }
 
         return false;
@@ -220,9 +228,11 @@ public class Mysql {
      * @return                  true 设置成功
      */
     public boolean save(String savePoint){
-        if(isTransaction && this.savePoint.get(savePoint) == null){
+        checkTransaction(true);
+
+        if(this.savePoint.get(savePoint) == null){
             try {
-                Savepoint savepoint = conn.setSavepoint(savePoint);
+                Savepoint savepoint = conn.get().setSavepoint(savePoint);
                 this.savePoint.put(savePoint,savepoint);
                 return true;
             } catch (SQLException e) {
@@ -238,12 +248,14 @@ public class Mysql {
      * @return              true 回滚成功
      */
     public boolean back(String savePoint){
+        checkTransaction(true);
         Savepoint point = this.savePoint.get(savePoint);
+
         // 是否需要关闭
-        if(isTransaction && point != null){
+        if(point != null){
 
             try {
-                conn.rollback(point);
+                conn.get().rollback(point);
                 return true;
             } catch (SQLException e) {
                 setErrorList(e.getMessage());
@@ -254,16 +266,23 @@ public class Mysql {
     }
 
     public boolean back(){
-        if(isTransaction){
-            try {
-                conn.rollback();
-                return true;
-            } catch (SQLException e) {
-                setErrorList(e.getMessage());
-            }
+        checkTransaction(true);
+
+        try {
+            conn.get().rollback();
+            return true;
+        } catch (SQLException e) {
+            setErrorList(e.getMessage());
         }
 
         return false;
+    }
+
+    /**
+     * 检测事务开启状况
+     */
+    private void checkTransaction(boolean bool){
+        if(isTransaction != bool){throw new NullPointerException(TRANSACTION_TIPS);}
     }
 
     /**
@@ -273,7 +292,10 @@ public class Mysql {
         try {
             commit();
 
-            if(conn != null){conn.close();}
+            if(conn != null){
+                conn.get().close();
+                conn.remove();
+            }
 
 
 

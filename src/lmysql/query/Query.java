@@ -3,7 +3,6 @@ package lmysql.query;
 import lmysql.LMysql;
 
 import java.sql.Connection;
-import java.util.List;
 
 public class Query extends LMysql<Query,Object> {
     private String sql;
