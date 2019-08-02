@@ -1,26 +1,16 @@
 import lmysql.Mysql;
 
+import java.util.List;
+
 public class Demo {
     public static void main(String[] args) {
-        Mysql mysql = new Mysql(true);
+        Mysql mysql = new Mysql();
+        P p = new P();
+        p.setKind(1);
+        p.setPname("测试");
+        p.setPon("p9");
 
-        int res = mysql
-                .update("goodsinfo")
-                .set("goods_name","测试6")
-                .where("id",7)
-                .query(1);
-
-        mysql.save("a");
-
-        mysql
-                .update("goodsinfo")
-                .set("goods_name","测试7")
-                .where("id",7)
-                .query(1);
-
-        mysql.back("a");
-
-        System.out.println(mysql.getErrorList());
+        Integer res = mysql.insert(p).query();
 
         mysql.close();
     }

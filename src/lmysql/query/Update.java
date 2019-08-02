@@ -10,7 +10,7 @@ public class Update extends LMysql<Update,Integer> {
     private StringBuffer setInfo = new StringBuffer();
     public Update(Connection conn, ILJson obj,String[] updateField){
         setConn(conn);
-
+        from(obj);
         Map<String,Object> info = obj.getParam();
         int len = updateField.length;
 

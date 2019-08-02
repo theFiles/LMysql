@@ -1,11 +1,33 @@
 package ljson;
 
+import ljson.annotation.DbField;
+import ljson.annotation.Table;
+
+import java.io.ObjectInputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+@Table("")
 public interface ILJson {
+
+    /**
+     * 取表名
+     */
+    default String getTable(){
+        Class thisCls = this.getClass();
+        Class<Table> tableCls = Table.class;
+        String res = "";
+
+        if(thisCls.isAnnotationPresent(tableCls)){
+            Table table = (Table)thisCls.getAnnotation(tableCls);
+            res = table.value();
+        }
+
+        return res;
+    }
 
     /**
      * 取所有属性的键值
@@ -18,29 +40,35 @@ public interface ILJson {
         Class thisClass = this.getClass();
         // 取当前类中所有的属性
         Field[] declaredFields = thisClass.getDeclaredFields();
+        // 取字段注解类
+        Class<DbField> dbFieldCls = DbField.class;
 
 
-        for (Field f:declaredFields){
-            // 属性名
-            String key = f.getName();
+        for (Field f:declaredFields) {
+            if (f.isAnnotationPresent(dbFieldCls)) {
+                // 检测注解
+                String field = f.getAnnotation(dbFieldCls).value();
+                if("id".equals(field)){continue;}
 
-            // 通过属性名取get方法名
-            String methodName = "get"
-                    +key.substring(0,1).toUpperCase()
-                    +key.substring(1);
+                // 属性名
+                String key = f.getName();
 
-            // 属性值
-            Object value;
-            try {
-                // 调用get方法取值
-                value = thisClass.getMethod(methodName).invoke(this);
+                // 通过属性名取get方法名
+                String methodName = "get"
+                        + key.substring(0, 1).toUpperCase()
+                        + key.substring(1);
+
+                // 属性值
+                Object value;
+                try {
+                    // 调用get方法取值
+                    value = thisClass.getMethod(methodName).invoke(this);
+                } catch (Exception e) {
+                    value = "error value!";
+                }
+
+                map.put(field, value);
             }
-
-            catch (Exception e) {
-                value = "error value!";
-            }
-
-            map.put(key,value);
         }
 
         return map;
@@ -72,12 +100,10 @@ public interface ILJson {
     /**
      * 通过map修改类的内容
      * @param map       map集合
-     * @param keySet    键名集合
      */
-    default void set(Map map,Set<String> keySet){
-        Set<String> keys = keySet == null ?
-                map.keySet() :
-                keySet ;
+    default void set(Map<String,Object> map,boolean isAnnotation){
+        if(isAnnotation){map = annotationToField(map);}
+        Set<String> keys = map.keySet();
 
         for (String k:keys){
             Object mapVal = map.get(k);
@@ -87,8 +113,32 @@ public interface ILJson {
             }
         }
     }
-    default void set(Map map){
-        set(map,null);
+
+    /**
+     * 通过注解转换成字段名
+     * @param map   原集合
+     * @return      整理后的集合
+     */
+    default Map<String,Object> annotationToField(Map<String,Object> map){
+        HashMap<String,Object> newMap = new HashMap<>();
+        Class cls                     = this.getClass();
+        Field[] fields                = cls.getDeclaredFields();
+        Class<DbField> dbFieldClass   = DbField.class;
+        int len                       = fields.length;
+
+
+        for (int i = 0; i < len; i++) {
+            Field field = fields[i];
+            if(field.isAnnotationPresent(dbFieldClass)){
+                String key = field.getAnnotation(dbFieldClass).value();
+                Object value = map.get(key);
+                if(value != null) {
+                    newMap.put(field.getName(),value);
+                }
+            }
+        }
+
+        return newMap;
     }
 
     /**

@@ -154,7 +154,7 @@ public class Mysql {
      * 增 对象
      */
     public Insert insert(ILJson obj){
-        return insert(obj.getParam());
+        return new Insert(conn.get(),obj);
     }
     public Insert insert(Map info){
         return new Insert(conn.get(),info);

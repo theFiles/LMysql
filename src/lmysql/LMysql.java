@@ -1,6 +1,7 @@
 package lmysql;
 
 import com.sun.istack.internal.NotNull;
+import ljson.ILJson;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -171,6 +172,9 @@ abstract public class LMysql<T,R> {
     public T from(String table){
         from = table;
         return getThis();
+    }
+    public T from(ILJson obj){
+        return from(obj.getTable());
     }
 
     protected String getFrom(){
