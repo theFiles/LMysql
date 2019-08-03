@@ -6,6 +6,7 @@ import java.util.List;
 
 /**
  * json转list
+ * @author lidaye
  */
 public class JsonList extends Json{
 

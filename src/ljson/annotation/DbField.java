@@ -2,6 +2,10 @@ package ljson.annotation;
 
 import java.lang.annotation.*;
 
+/**
+ * 字段注解
+ * @author lidaye
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DbField {

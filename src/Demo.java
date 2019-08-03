@@ -1,3 +1,6 @@
+import ljson.JsonList;
+import ljson.JsonMap;
+import ljson.LJson;
 import lmysql.Mysql;
 
 import java.util.List;
@@ -11,11 +14,11 @@ public class Demo {
         p.setPname("测试");
         p.setPon("p9");
 
-        Integer res = mysql.update(p).where("id", 111).query();
+        List<P> res = mysql.select().query(p);
+//        Integer res = mysql.update(p).where("id", 111).query();
 //        Integer res = mysql.delete(p,"id").query(1);
 //        Integer res = mysql.insert(p).query();
 
-        System.out.println(mysql.getErrorList());
         System.out.println(res);
 
         mysql.close();

@@ -90,9 +90,10 @@ public interface ILJson {
 
     /**
      * 取所有属性的键值
-     * @return      所有属性的键值集合
+     * @param isFilter      是否要过滤PRIMARY
+     * @return              所有属性的键值集合
      */
-    default Map getParam(){
+    default Map getParam(boolean isFilter){
         // 返回的Map
         Map map = new HashMap();
         // 取当前类中所有的属性
@@ -105,13 +106,16 @@ public interface ILJson {
             if (f.isAnnotationPresent(dbFieldCls)) {
                 // 过滤PRIMARY
                 DbField dbField = f.getAnnotation(dbFieldCls);
-                if("PRIMARY".equals(dbField.cst().toString())){continue;}
+                if(isFilter && "PRIMARY".equals(dbField.cst().toString())){continue;}
 
                 map.put(dbField.value(), get(f.getName()));
             }
         }
 
         return map;
+    }
+    default Map getParam(){
+        return getParam(true);
     }
 
     /**

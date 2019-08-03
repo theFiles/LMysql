@@ -1,5 +1,10 @@
 package ljson.annotation;
 
+/**
+ * 约束级别
+ * @author lidaye
+ */
+
 public enum Constraint {
     /**
      * 主键

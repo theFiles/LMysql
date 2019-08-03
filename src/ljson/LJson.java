@@ -7,6 +7,7 @@ import java.util.Map;
 /**
  * 转换后的操作类
  * 暂时只提供查询
+ * @author lidaye
  */
 public class LJson<T> {
     /**
@@ -55,13 +56,14 @@ public class LJson<T> {
      * @return          值
      */
     public Object get(Object... keys){
-        int lastIndex = keys.length-1; // 保留最后一位用来取值
-        Object nowObj = obj; // 当前对象
+        // 保留最后一位用来取值
+        int lastIndex = keys.length-1;
+        // 当前对象
+        Object nowObj = obj;
 
         for(int i=0; i<lastIndex; i++){
             // 没有下一维
-            if(!(obj instanceof Map || obj instanceof List))
-                return null;
+            if(!(obj instanceof Map || obj instanceof List)){return null;}
 
             // 解析到下一维
             nowObj = getValue(nowObj,keys,i);
@@ -88,6 +90,7 @@ public class LJson<T> {
         }
     }
 
+    @Override
     public String toString(){
         return obj.toString();
     }

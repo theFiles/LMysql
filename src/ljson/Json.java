@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 /**
  * json操作
+ * @author lidaye
  */
 public abstract class Json {
     /**
@@ -88,11 +89,16 @@ public abstract class Json {
      * @return          字符串形式的list
      */
     protected static List<String> split(String str, char flag, int depth){
-        int len          = str.length(); // json字符串长度
-        int prevIndex    = 0; // 上一个符合条件的位置
-        int ignore       = 0; // 忽略阈值 0是不忽略
-        boolean igIgnore = true; // 忽略忽略
-        int depthNum     = 0; // 深度计数器
+        // json字符串长度
+        int len          = str.length();
+        // 上一个符合条件的位置
+        int prevIndex    = 0;
+        // 忽略阈值 0是不忽略
+        int ignore       = 0;
+        // 忽略忽略
+        boolean igIgnore = true;
+        // 深度计数器
+        int depthNum     = 0;
         // list容器
         List<String> resArr    = new ArrayList<>();
 
@@ -100,8 +106,7 @@ public abstract class Json {
             char nowChar = str.charAt(i);
 
             // 切换忽略忽略
-            if(nowChar == '"')
-                igIgnore = igIgnore?false:true;
+            if(nowChar == '"'){igIgnore = igIgnore?false:true;}
 
             if(igIgnore){
                 // 开始忽略匹配
@@ -113,7 +118,7 @@ public abstract class Json {
                 else if(
                     ignore != 0
                     && charInArray(ignoreE,nowChar)
-                ) --ignore;
+                ){--ignore;}
             }
 
             // 是否忽略匹配
@@ -122,7 +127,7 @@ public abstract class Json {
                 resArr.add(str.substring(prevIndex,i));
                 prevIndex = i+1;
                 ++depthNum;
-                if(depthNum == depth) break;
+                if(depthNum == depth){break;}
             }
         }
 
@@ -175,8 +180,7 @@ public abstract class Json {
         StringBuffer buff = new StringBuffer();
 
         // 普通自定义对象转为map
-        if(obj instanceof ILJson)
-            obj = ((ILJson) obj).getParam();
+        if(obj instanceof ILJson){obj = ((ILJson) obj).getParam(false);}
 
         // Map
         if(obj instanceof Map){
@@ -192,8 +196,7 @@ public abstract class Json {
             }
 
             // 去除多余分隔符
-            if(buff.length() > 1)
-                buff.deleteCharAt(buff.length()-1);
+            if(buff.length() > 1){buff.deleteCharAt(buff.length()-1);}
 
             // 结束
             buff.append("}");
@@ -223,7 +226,7 @@ public abstract class Json {
         }
 
         // int或其他
-        else buff.append(obj);
+        else{buff.append(obj);}
 
         // 分隔符
         buff.append(',');
@@ -257,18 +260,18 @@ public abstract class Json {
      */
     public static String uniCode(char c){
         StringBuffer buff = new StringBuffer("\\u");
-        int j = (c >>>8); //取出高8位
+        //取出高8位
+        int j = (c >>>8);
         String tmp = Integer.toHexString(j);
 
-        if (tmp.length() == 1)
-            buff.append("0");
+        if (tmp.length() == 1){buff.append("0");}
 
         buff.append(tmp);
-        j = (c & 0xFF); //取出低8位
+        //取出低8位
+        j = (c & 0xFF);
         tmp = Integer.toHexString(j);
 
-        if (tmp.length() == 1)
-            buff.append("0");
+        if (tmp.length() == 1){buff.append("0");}
 
         buff.append(tmp);
 

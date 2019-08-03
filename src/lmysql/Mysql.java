@@ -14,17 +14,12 @@ import java.util.*;
  */
 public class Mysql {
     /**
-     * 配置地址
+     * 配置文件位置
      */
-    final private static String PROPSPATH = "lmysql/db.properties";
+    final private static String PROPSPATH = "db.properties";
 
     /**
-     * 配置对象
-     */
-    private static Properties props;
-
-    /**
-     * 错误提示（暂时毛用）
+     * 错误提示
      */
     private static List<String> errorList;
 
@@ -59,11 +54,11 @@ public class Mysql {
     private static DataSource dataSource;
 
     /**
-     * 配置文件读取
+     * 配置读取
      */
     static {
         InputStream is = Mysql.class.getClassLoader().getResourceAsStream(PROPSPATH);
-        props = new Properties();
+        Properties props = new Properties();
         try {
             props.load(is);
             dataSource = DruidDataSourceFactory.createDataSource(props);

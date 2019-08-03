@@ -7,6 +7,7 @@ import java.util.Map;
 
 /**
  * json转Map
+ * @author lidaye
  */
 public class JsonMap extends Json{
 
@@ -59,7 +60,8 @@ public class JsonMap extends Json{
 
             // 字符串以 , 拆分
             List<String> arr = split(subStr(json), ',',0);
-            int len = arr.size(); // 数组长度
+            // 数组长度
+            int len = arr.size();
 
             for (int i = 0; i < len; i++) {
                 // 字符串以 : 拆分
