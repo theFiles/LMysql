@@ -1,6 +1,5 @@
 package lmysql.query;
 
-import ljson.ILJson;
 import lmysql.LMysql;
 
 import java.sql.Connection;
@@ -9,14 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 
+/**
+ * 新增操作列
+ * @author lidaye
+ */
 public class Insert extends LMysql<Insert,Integer> {
     private String[] fields;
     private List values = new ArrayList();
-
-    public Insert(Connection conn, ILJson obj){
-        this(conn,obj.getParam());
-        from(obj);
-    }
 
     public Insert(Connection conn, Map info){
         int num = 0;

@@ -1,16 +1,17 @@
 package lmysql.query;
 
 import ljson.ILJson;
-import ljson.annotation.Table;
 import lmysql.*;
 
-import java.lang.annotation.Annotation;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+/**
+ * 查询操作类
+ * @author lidaye
+ */
 public class Select extends LMysql<Select,List<Map>>{
     /**
      * 默认查询结果
@@ -36,6 +37,9 @@ public class Select extends LMysql<Select,List<Map>>{
         selectLen = arr.length;
     }
 
+    /**
+     * 取结果集sql
+     */
     private String getSelect(){
         if(selectLen == 0){return DEFAULT_RES;}
 
@@ -66,18 +70,28 @@ public class Select extends LMysql<Select,List<Map>>{
      * 运行结果存到指定类中
      */
     public <E> List<E> query(E obj){
+        // 根据对象的注解设值类名
         from((ILJson)obj);
+        // 返回的对象集合
         List<E> returnList = new ArrayList<>();
+        // 查询结果
         List<Map> res = execute();
+
+        // 查询结果判断
         if(res != null && res.size() > 0) {
+            // 反射取对象的类对象
             Class iLjsonClass = obj.getClass();
+            // 遍历查询结果
             for (Map r : res) {
                 try {
+                    // 动态实例化一个新对象
                     ILJson nowObj = (ILJson)iLjsonClass.newInstance();
+                    // 给对象赋值
                     nowObj.set(r,true);
+                    // 给对象集合赋值
                     returnList.add((E)nowObj);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // 不可能会报错
                 }
             }
 

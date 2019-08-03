@@ -98,6 +98,7 @@ abstract public class LMysql<T,R> {
 
     /**
      * 执行 增、删、改
+     * @return      返回修改条目数
      */
     protected int update(){
         int res = 0;
@@ -116,6 +117,10 @@ abstract public class LMysql<T,R> {
         return res;
     }
 
+    /**
+     * 执行查询
+     * @return      返回结果
+     */
     protected List<Map> execute(){
         List<Map> resList = null;
 
@@ -371,6 +376,9 @@ abstract public class LMysql<T,R> {
         return getThis();
     }
 
+    /**
+     * 整理排序sql
+     */
     private String setOrderBy(String[] field){
 
         StringBuffer buff = new StringBuffer('`'+field[0]+'`');
@@ -383,8 +391,11 @@ abstract public class LMysql<T,R> {
         return buff.toString();
     }
 
+    /**
+     * 取完整的排序sql
+     */
     protected String getOrderBy(){
-        if(isOrderBy == 0) return "";
+        if(isOrderBy == 0){return "";}
 
         return " ORDER BY " + (isOrderBy == 1
                 ? asc+desc
@@ -406,6 +417,8 @@ abstract public class LMysql<T,R> {
      * 是否要换位符
      */
     protected String setValue(Object value,boolean custom){
+        if(value == null){return "null";}
+
         if(custom){
             // 添加条件占位符替换值
             replaceVal.add(value.toString());

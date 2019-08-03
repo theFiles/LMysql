@@ -75,7 +75,7 @@ public abstract class Json {
         }
 
         // 数值
-        else if(isInteger(json)) return 1;
+        else if(isInteger(json)){return 1;}
 
         return 0;
     }

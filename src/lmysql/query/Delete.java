@@ -4,11 +4,11 @@ import lmysql.LMysql;
 
 import java.sql.Connection;
 
+/**
+ * 删除操作类
+ * @author lidaye
+ */
 public class Delete extends LMysql<Delete,Integer> {
-    public Delete(Connection conn, String table){
-        from(table);
-        setConn(conn);
-    }
     public Delete(Connection conn){
         setConn(conn);
     }

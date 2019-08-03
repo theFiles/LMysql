@@ -4,6 +4,10 @@ import lmysql.LMysql;
 
 import java.sql.Connection;
 
+/**
+ * 特殊操作类
+ * @author lidaye
+ */
 public class Query extends LMysql<Query,Object> {
     private String sql;
     private boolean isUpdate;

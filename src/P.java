@@ -1,10 +1,11 @@
 import ljson.ILJson;
+import ljson.annotation.Constraint;
 import ljson.annotation.DbField;
 import ljson.annotation.Table;
 
 @Table("P")
 public class P implements ILJson {
-    @DbField("id")
+    @DbField(value="id",cst=Constraint.PRIMARY)
     private int id;
     @DbField("pno")
     private String pon;

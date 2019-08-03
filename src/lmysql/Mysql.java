@@ -34,7 +34,7 @@ public class Mysql {
     private static final byte ERROR_COUNT = 4;
 
     /**
-     * 数据库连接
+     * 数据库连接对象（线程安全）
      */
     private static ThreadLocal<Connection> conn = new ThreadLocal<>();
 
@@ -72,6 +72,10 @@ public class Mysql {
         }
     }
 
+    /**
+     * 取连接对象并启动事务
+     * @param isTransaction     事务开关 true 启动
+     */
     public Mysql(boolean isTransaction){
         this();
         if(isTransaction){begin();}
@@ -154,7 +158,7 @@ public class Mysql {
      * 增 对象
      */
     public Insert insert(ILJson obj){
-        return new Insert(conn.get(),obj);
+        return new Insert(conn.get(),obj.getParam()).from(obj);
     }
     public Insert insert(Map info){
         return new Insert(conn.get(),info);
@@ -167,10 +171,10 @@ public class Mysql {
      * 改 对象
      */
     public Update update(ILJson obj,String... updateField){
-        return new Update(conn.get(),obj,updateField);
+        return new Update(conn.get()).from(obj).set(obj.getParam(),updateField);
     }
     public Update update(String table){
-        return new Update(conn.get(),table);
+        return new Update(conn.get()).from(table);
     }
     public Update update(){
         return new Update(conn.get());
@@ -180,10 +184,13 @@ public class Mysql {
      * 删 对象
      */
     public Delete delete(String table){
-        return new Delete(conn.get(),table);
+        return new Delete(conn.get()).from(table);
     }
     public Delete delete(){
         return new Delete(conn.get());
+    }
+    public Delete delete(ILJson obj,String fieldName){
+        return delete(obj.getTable()).where(fieldName,obj.get(fieldName));
     }
 
     /**
@@ -289,14 +296,13 @@ public class Mysql {
      */
     public void close(){
         try {
+            // 提交事务
             if(isTransaction){commit();}
 
             if(conn != null){
                 conn.get().close();
                 conn.remove();
             }
-
-
 
         } catch (SQLException e) {
             setErrorList(e.getMessage());
