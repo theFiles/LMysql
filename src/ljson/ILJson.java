@@ -103,12 +103,18 @@ public interface ILJson {
 
         // 遍历说有属性
         for (Field f:declaredFields) {
+            // 有注解
             if (f.isAnnotationPresent(dbFieldCls)) {
                 // 过滤PRIMARY
                 DbField dbField = f.getAnnotation(dbFieldCls);
                 if(isFilter && "PRIMARY".equals(dbField.cst().toString())){continue;}
 
                 map.put(dbField.value(), get(f.getName()));
+            }
+            // 无注解
+            else{
+                String key = f.getName();
+                map.put(key, get(key));
             }
         }
 

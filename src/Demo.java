@@ -13,13 +13,12 @@ public class Demo {
         p.setKind(1);
         p.setPname("测试");
         p.setPon("p9");
-
         List<P> res = mysql.select().query(p);
 //        Integer res = mysql.update(p).where("id", 111).query();
 //        Integer res = mysql.delete(p,"id").query(1);
 //        Integer res = mysql.insert(p).query();
 
-        System.out.println(res);
+        System.out.println(res.get(0));
 
         mysql.close();
     }
