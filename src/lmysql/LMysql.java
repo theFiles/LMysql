@@ -267,7 +267,7 @@ abstract public class LMysql<T,R> {
         return whereLike(key,value,join,true);
     }
     public T whereLike(String key,Object value,String join,boolean custom){
-        return where(key,"%"+setValue(value,custom)+"%","LIKE",join,false);
+        return where(key,setValue("%"+value+"%",custom),"LIKE",join,false);
     }
 
     /**

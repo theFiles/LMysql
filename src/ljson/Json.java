@@ -244,6 +244,8 @@ public abstract class Json {
         int len = str.length();
         for (int i=0; i<len; i++){
             char nowChar = str.charAt(i);
+            if(nowChar == '"'){buff.append("\\");}
+
             buff.append(
                 isChinese(((Character)nowChar).toString())
                     ? uniCode(nowChar)
