@@ -136,7 +136,7 @@ public abstract class Json {
     }
 
     /**
-     * 过滤字符串（" & \ & \u）
+     * 过滤字符串
      * @param str       原字符串
      * @return          过滤后的字符串
      */
