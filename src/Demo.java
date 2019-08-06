@@ -14,7 +14,6 @@ public class Demo {
 //        Integer res = mysql.update(p).where("id", 111).query();
 //        Integer res = mysql.delete(p,"id").query(1);
 //        Integer res = mysql.insert(p).query();
-
         System.out.println(res.get(0));
 
         mysql.close();
