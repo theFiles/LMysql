@@ -136,6 +136,15 @@ public abstract class Json {
     }
 
     /**
+     * 过滤字符串（" & \ & \u）
+     * @param str       原字符串
+     * @return          过滤后的字符串
+     */
+    protected static String filterStr(String str){
+        return deUnicode(str.substring(1, str.length() - 1).replace("\\\"","\""));
+    }
+
+    /**
      * 字符串是不是数字
      * @param str   字符串
      * @return      是/否

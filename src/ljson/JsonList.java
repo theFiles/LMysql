@@ -56,7 +56,6 @@ public class JsonList extends Json{
         if(!beCheck || strType(json,4)){
             List<String> arr = split(subStr(json), ',',0);
             int len = arr.size();
-
             for (int i=0; i<len; i++){
                 String value = arr.get(i);
                 switch (strType(value)) {
@@ -72,7 +71,7 @@ public class JsonList extends Json{
 
                     // 字符串，去掉双引号赋值
                     case 2:
-                        list.add(value.substring(1, value.length() - 1));
+                        list.add(filterStr(value));
                         break;
 
                     // 数值，转为整数后赋值

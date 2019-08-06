@@ -84,7 +84,7 @@ public class JsonMap extends Json{
 
                     // 字符串，去掉双引号赋值
                     case 2:
-                        map.put(key, deUnicode(value.substring(1, value.length() - 1)));
+                        map.put(key, filterStr(value));
                         break;
 
                     // 数值，转为整数后赋值
