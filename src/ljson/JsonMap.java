@@ -46,6 +46,15 @@ public class JsonMap extends Json{
     }
 
     /**
+     * 通过实现了ILJson的实体对象转为json
+     * @param obj   对象
+     * @return      json字符串
+     */
+    public static String encode(ILJson obj){
+        return encode(obj.getParam(false));
+    }
+
+    /**
      * 把json字符串转成map
      * @param json      json字符串
      * @param beCheck   json字符串进行类型检测开关
