@@ -1,4 +1,4 @@
-package ljson;
+package lidaye.ljson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,9 +43,9 @@ public abstract class Json {
         return strType(json) == ckType;
     }
     /**
-     * json字符串类型识别 0.异常 1.数值 2.字符串 3.module.ljson 4.list
+     * json字符串类型识别 0.异常 1.数值 2.字符串 3.module.lidaye.ljson 4.list
      * @param json  json字符串
-     * @return      0.异常 1.数值 2.字符串 3.module.ljson 4.list
+     * @return      0.异常 1.数值 2.字符串 3.module.lidaye.ljson 4.list
      */
     protected static byte strType(String json){
         String tempStr = json.trim();

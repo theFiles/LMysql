@@ -1,7 +1,7 @@
-import ljson.ILJson;
-import ljson.annotation.Constraint;
-import ljson.annotation.DbField;
-import ljson.annotation.Table;
+import lidaye.ljson.ILJson;
+import lidaye.ljson.annotation.Constraint;
+import lidaye.ljson.annotation.DbField;
+import lidaye.ljson.annotation.Table;
 
 @Table("P")
 public class P implements ILJson {

@@ -1,7 +1,7 @@
-package lmysql.query;
+package lidaye.lmysql.query;
 
-import ljson.ILJson;
-import lmysql.*;
+import lidaye.ljson.ILJson;
+import lidaye.lmysql.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -67,25 +67,35 @@ public class Select extends LMysql<Select,List<Map>>{
     }
 
     /**
-     * 运行结果存到指定类中
+     * 运行结果存到指定实例中
+     * @param obj   对象实例
+     * @return      实例集合
      */
     public <E> List<E> query(E obj){
         // 根据对象的注解设值类名
         from((ILJson)obj);
+        return query((Class<E>) obj.getClass());
+    }
+
+    /**
+     * 运行结果存到指定类中
+     * @param cls   类对象
+     * @return      类实例集合
+     */
+    public <E> List<E> query(Class<E> cls){
         // 返回的对象集合
-        List<E> returnList = new ArrayList<>();
+        List<E> returnList = null;
         // 查询结果
         List<Map> res = execute();
 
         // 查询结果判断
         if(res != null && res.size() > 0) {
-            // 反射取对象的类对象
-            Class iLjsonClass = obj.getClass();
+            returnList = new ArrayList<>();
             // 遍历查询结果
             for (Map r : res) {
                 try {
                     // 动态实例化一个新对象
-                    ILJson nowObj = (ILJson)iLjsonClass.newInstance();
+                    ILJson nowObj = (ILJson)cls.newInstance();
                     // 给对象赋值
                     nowObj.set(r,true);
                     // 给对象集合赋值
@@ -94,10 +104,9 @@ public class Select extends LMysql<Select,List<Map>>{
                     // 不可能会报错
                 }
             }
-
-            return returnList;
         }
-        return null;
+
+        return returnList;
     }
 
     /**

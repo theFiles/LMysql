@@ -1,4 +1,4 @@
-package ljson;
+package lidaye.ljson;
 
 
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class JsonList extends Json{
                         list.add(getJsonList(value,false,errRep));
                         break;
 
-                    // module.ljson,递归
+                    // module.lidaye.ljson,递归
                     case 3:
                         list.add(JsonMap.getJsonMap(value, false,errRep));
                         break;

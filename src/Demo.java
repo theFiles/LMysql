@@ -1,4 +1,4 @@
-import lmysql.Mysql;
+import lidaye.lmysql.Mysql;
 
 import java.util.List;
 

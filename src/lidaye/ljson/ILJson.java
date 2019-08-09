@@ -1,7 +1,7 @@
-package ljson;
+package lidaye.ljson;
 
-import ljson.annotation.DbField;
-import ljson.annotation.Table;
+import lidaye.ljson.annotation.DbField;
+import lidaye.ljson.annotation.Table;
 
 import java.lang.reflect.*;
 import java.util.HashMap;

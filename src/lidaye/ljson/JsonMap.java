@@ -1,4 +1,4 @@
-package ljson;
+package lidaye.ljson;
 
 
 import java.util.HashMap;
@@ -86,7 +86,7 @@ public class JsonMap extends Json{
                         map.put(key,JsonList.getJsonList(value,false,errRep));
                         break;
 
-                    // module.ljson,递归
+                    // module.lidaye.ljson,递归
                     case 3:
                         map.put(key, getJsonMap(value, false,errRep));
                         break;

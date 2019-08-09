@@ -1,7 +1,8 @@
-package lmysql;
+package lidaye.lmysql;
 
 import com.sun.istack.internal.NotNull;
-import ljson.ILJson;
+import lidaye.ljson.ILJson;
+import lidaye.ljson.annotation.Table;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -180,6 +181,9 @@ abstract public class LMysql<T,R> {
     }
     public T from(ILJson obj){
         return from(obj.getTable());
+    }
+    public T from(Class<ILJson> cls){
+        return from(cls.getAnnotation(Table.class).value().toString());
     }
 
     protected String getFrom(){

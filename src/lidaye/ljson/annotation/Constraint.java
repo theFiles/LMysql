@@ -1,4 +1,4 @@
-package ljson.annotation;
+package lidaye.ljson.annotation;
 
 /**
  * 约束级别

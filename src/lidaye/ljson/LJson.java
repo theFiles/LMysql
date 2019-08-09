@@ -1,4 +1,4 @@
-package ljson;
+package lidaye.ljson;
 
 
 import java.util.List;
