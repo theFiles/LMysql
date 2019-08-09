@@ -182,7 +182,7 @@ abstract public class LMysql<T,R> {
     public T from(ILJson obj){
         return from(obj.getTable());
     }
-    public T from(Class<ILJson> cls){
+    public T from(Class<? extends ILJson> cls){
         return from(cls.getAnnotation(Table.class).value().toString());
     }
 

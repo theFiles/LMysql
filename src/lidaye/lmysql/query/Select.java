@@ -72,8 +72,6 @@ public class Select extends LMysql<Select,List<Map>>{
      * @return      实例集合
      */
     public <E> List<E> query(E obj){
-        // 根据对象的注解设值类名
-        from((ILJson)obj);
         return query((Class<E>) obj.getClass());
     }
 
@@ -83,11 +81,11 @@ public class Select extends LMysql<Select,List<Map>>{
      * @return      类实例集合
      */
     public <E> List<E> query(Class<E> cls){
+        from((Class<ILJson>)cls);
         // 返回的对象集合
         List<E> returnList = null;
         // 查询结果
         List<Map> res = execute();
-
         // 查询结果判断
         if(res != null && res.size() > 0) {
             returnList = new ArrayList<>();
