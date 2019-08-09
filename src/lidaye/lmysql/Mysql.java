@@ -152,15 +152,6 @@ public class Mysql {
     /**
      * 增 对象
      */
-    public Insert insert(Class<? extends ILJson> cls){
-        Insert insert = null;
-        try {
-            insert = insert(cls.newInstance());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return insert;
-    }
     public Insert insert(ILJson obj){
         return new Insert(conn.get(),obj.getParam()).from(obj);
     }
@@ -174,16 +165,6 @@ public class Mysql {
     /**
      * 改 对象
      */
-    public Update update(Class<? extends ILJson> cls,String... updateField){
-        Update update = null;
-        try {
-            update = update(cls.newInstance(), updateField);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return update;
-    }
     public Update update(ILJson obj,String... updateField){
         return new Update(conn.get()).from(obj).set(obj.getParam(),updateField);
     }
@@ -205,16 +186,6 @@ public class Mysql {
     }
     public Delete delete(ILJson obj,String fieldName){
         return delete(obj.getTable()).where(fieldName,obj.get(fieldName));
-    }
-    public Delete delete(Class<? extends ILJson> cls,String fieldName){
-        Delete delete = null;
-        try {
-            delete = delete(cls.newInstance(), fieldName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return delete;
     }
 
     /**
